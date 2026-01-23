@@ -1,13 +1,14 @@
 return {
   {
-    "ellisonleao/gruvbox.nvim",
-    priority = 1000, -- Ensures it loads first
+    "sainnhe/everforest",
+    priority = 1000,
     config = function()
-      require("gruvbox").setup({
-        terminal_colors = true, -- Use terminal's colors
-        transparent_mode = true, -- Keep transparency
-      })
-      vim.cmd("colorscheme gruvbox")
+      vim.g.everforest_background = "hard" -- Options: 'soft', 'medium', 'hard'
+      vim.g.everforest_enable_italic = 1
+      vim.g.everforest_transparent_background = 1 -- Enable transparency
+      vim.g.everforest_better_performance = 1
+      vim.g.everforest_termcolors = "256" -- Use terminal colors
+      vim.cmd("colorscheme everforest")
     end,
   },
 }
