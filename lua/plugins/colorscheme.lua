@@ -55,6 +55,37 @@ return {
         set("NeoTreeFileName", white)
         set("NeoTreeRootName", magenta)
         set("NeoTreeSymbolicLinkTarget", cyan)
+
+        -- 1. TONING DOWN THE GUTTER (The Number Bar)
+        set("LineNr", grey) -- The standard line numbers (muted grey)
+        set("CursorLineNr", red) -- ONLY the active line number is Red
+        set("SignColumn", black) -- Background of the gutter matches your black
+
+        -- 2. TONING DOWN GIT CHANGES (The "Add/Change" signs)
+        -- If you are using gitsigns.nvim or vim-gitgutter:
+        set("GitSignsAdd", green) -- Muted Green for additions
+        set("GitSignsChange", yellow) -- Muted Yellow/Orange for changes
+        set("GitSignsDelete", red) -- Red for deletions
+
+        -- 3. THE "SELECTED" LINE NUMBER COLOR
+        -- This is what you see in the left bar for the line you are currently on.
+        -- By setting the background to 'none' or 'black', it stops being a "strong" block.
+        set("CursorLineSign", red, "none") -- The gutter icon area for current line
+        set("CursorLineFold", red, "none") -- The fold area for current line
+
+        -- 4. FIXING THE "BLACK ON RED" IN THE GUTTER
+        -- Sometimes git plugins try to force a background. This forces transparency.
+        local git_groups = {
+          "GitSignsAdd",
+          "GitSignsChange",
+          "GitSignsDelete",
+          "GitSignsAddLn",
+          "GitSignsChangeLn",
+          "GitSignsDeleteLn",
+        }
+        for _, group in ipairs(git_groups) do
+          vim.api.nvim_set_hl(0, group, { ctermfg = nil, ctermbg = "none", force = true })
+        end
       end
 
       -- DISABLE SEMANTIC TOKENS (The "Anti-Vanilla" Shield)
