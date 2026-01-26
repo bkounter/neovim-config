@@ -1,79 +1,63 @@
 return {
   {
-    "tinted-theming/tinted-vim",
+    "chriskempson/base16-vim",
     lazy = false,
     priority = 1000,
     config = function()
-      vim.opt.termguicolors = false -- Use terminal ANSI colors
-      vim.g.tinted_background_transparent = 1
+      vim.opt.termguicolors = false -- Vital for Ghostty ANSI sync
       vim.cmd("colorscheme base16-default-dark")
 
-      local function apply_manual_map()
-        -- PALETTE DEFINITIONS (Standard ANSI 16)
-        local red = 1
-        local green = 2
-        local yellow = 3
-        local blue = 4
-        local magenta = 5
-        local cyan = 6
-        local white = 7
-        local grey = 8
+      local function apply_full_palette()
+        -- Mapping all 15 Ghostty slots
+        local black, red, green, yellow, blue, magenta, cyan, white = 0, 1, 2, 3, 4, 5, 6, 7
+        local grey, b_red, b_green, b_yellow, b_blue, b_magenta, b_cyan, b_white = 8, 9, 10, 11, 12, 13, 14, 15
 
         local function set(group, fg, bg)
-          vim.api.nvim_set_hl(0, group, { ctermfg = fg, ctermbg = bg or "none", force = true })
+          vim.api.nvim_set_hl(0, group, {
+            ctermfg = fg,
+            ctermbg = bg or "none",
+            force = true,
+            bold = false,
+            italic = false,
+          })
         end
 
-        -- 1. CORE SYNTAX (Broken out by color)
-        set("Normal", white, "none")
-        set("Keyword", magenta)
-        set("Statement", red)
-        set("Identifier", red)
-        set("Function", blue)
-        set("String", green)
-        set("Number", yellow)
-        set("Boolean", yellow)
-        set("Type", yellow)
-        set("Operator", cyan)
-        set("Special", cyan)
+        -- 1. THE CODE CANVAS (Uses White/Grey)
+        set("Normal", white)
         set("Comment", grey)
+        set("LineNr", grey)
+        set("NonText", grey)
 
-        -- 2. TREESITTER (The Blue & White killers)
-        set("@variable", white)
-        set("@variable.member", white)
-        set("@variable.builtin", red)
-        set("@property", cyan)
-        set("@field", cyan)
-        set("@parameter", white)
-        set("@function", blue)
-        set("@function.call", blue)
-        set("@method", blue)
-        set("@keyword", magenta)
-        set("@string", green)
-        set("@constant", yellow)
-        set("@constant.builtin", yellow)
-        set("@punctuation.bracket", white)
-        set("@punctuation.delimiter", white)
-        set("@tag", red)
-        set("@tag.attribute", yellow)
+        -- 2. THE SYNTAX SPECTRUM (Using 1-6)
+        set("Keyword", magenta) -- return, if, else
+        set("Statement", red) -- const, let, var
+        set("Function", blue) -- function names
+        set("String", green) -- "quoted text"
+        set("Type", yellow) -- Classes and Types
+        set("Operator", cyan) -- =, +, =>
+        set("Identifier", b_white) -- Variables
+        set("Constant", b_yellow) -- Hardcoded numbers/Booleans
 
-        -- 3. UI & HIGHLIGHTS
-        set("LineNr", grey, "none")
-        set("CursorLineNr", yellow, "none")
-        set("Visual", 0, yellow) -- Selection: Black text (0) on Yellow (3)
-        set("Search", 0, yellow)
-        set("WinSeparator", grey, "none")
-        set("CursorLine", nil, 0) -- Dark background for current line
+        -- 3. REACT & WEB SPECIFICS
+        set("@tag", red) -- <Section>
+        set("@tag.delimiter", grey) -- < and >
+        set("@tag.attribute", yellow) -- props
+        set("@parameter", cyan) -- id, index, array
+        set("Delimiter", white) -- { } [ ]
 
-        -- 4. EXPLORER (Snacks/NeoTree)
-        set("SnacksNormal", white, "none")
-        set("SnacksPicker", white, "none")
-        set("NeoTreeNormal", white, "none")
+        -- 4. THE UI (Black-on-Color for Contrast)
+        set("Visual", black, yellow) -- Black text on Yellow selection
+        set("Search", black, orange)
+        set("CursorLine", nil, black) -- Subtle dark bar for the line
+
+        -- 5. EXPLORER (NeoTree)
         set("NeoTreeDirectoryName", blue)
         set("NeoTreeFileName", white)
+        set("NeoTreeRootName", magenta)
         set("NeoTreeSymbolicLinkTarget", cyan)
       end
 
-      -- DISABLE SEMANTIC TOKENS (Prevents LSP from overriding our colors)
+      -- DISABLE SEMANTIC TOKENS (The "Anti-Vanilla" Shield)
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(args)
           local client = vim.lsp.get_client_by_id(args.data.client_id)
@@ -83,11 +67,13 @@ return {
         end,
       })
 
-      apply_manual_map()
+      apply_full_palette()
 
-      -- Watchdog to maintain the theme during buffer switches
-      vim.api.nvim_create_autocmd({ "BufEnter", "ColorScheme", "FileType" }, {
-        callback = apply_manual_map,
+      -- Watchdog: keeps the colors from snapping back
+      vim.api.nvim_create_autocmd({ "BufEnter", "FileType" }, {
+        callback = function()
+          vim.schedule(apply_full_palette)
+        end,
       })
     end,
   },
