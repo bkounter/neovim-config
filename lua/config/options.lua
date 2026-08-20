@@ -3,3 +3,7 @@
 -- Add any additional options here
 vim.g.snacks_animate = false
 vim.opt.laststatus = 0
+
+-- Enable inlay hints by default (type hints & parameter names in Rust/LSP)
+vim.g.lazyvim_inlay_hints = { enabled = true }
+
